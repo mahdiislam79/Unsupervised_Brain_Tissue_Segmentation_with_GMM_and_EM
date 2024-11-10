@@ -2,33 +2,30 @@ import numpy as np
 from sklearn.cluster import KMeans
 
 def initialize_clusters(data, n_clusters=3, random_state=0):
-    """Initialize clusters using k-means."""
+    """Initialize clusters using k-means for mu, sigma, and pi."""
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state).fit(data)
-    return kmeans.cluster_centers_, kmeans.labels_
-
-def calculate_sigma(data, labels, n_clusters=3):
-    """Calculate standard deviation for each cluster."""
-    sigma = []
-    for i in range(n_clusters):
-        cluster_points = data[labels == i]
-        cluster_std = np.std(cluster_points, axis=0)
-        sigma.append(cluster_std)
-    return np.array(sigma)
+    mu = kmeans.cluster_centers_
+    labels = kmeans.labels_
+    sigma = np.array([np.std(data[labels == i], axis=0) for i in range(n_clusters)])
+    pi = np.ones(n_clusters) / n_clusters  # Equal probability for each cluster initially
+    return mu, sigma, pi
 
 def gaussian_pdf(data, mean, cov):
     """Calculate Gaussian probability density function with numerical stability."""
     size = len(data)
-    cov += np.eye(size) * 1e-6  # Add a small value to the diagonal
+    cov += np.eye(size) * 1e-6  # Add small value to diagonal for stability
     det = np.linalg.det(cov)
     norm_const = 1.0 / (np.power((2 * np.pi), float(size) / 2) * np.power(det, 1.0 / 2))
     data_diff = data - mean
     result = np.exp(-0.5 * np.sum(np.dot(data_diff, np.linalg.inv(cov)) * data_diff, axis=1))
     return norm_const * result
 
+def em_algorithm(data, max_iter=100, tol=1e-6, n_clusters=3):
+    """EM algorithm for Gaussian Mixture Models with k-means initialization."""
+    # Initialize using KMeans
+    mu, sigma, pi = initialize_clusters(data, n_clusters)
 
-def em_algorithm(data, mu, sigma, pi, max_iter=100, tol=1e-6):
     n_samples, n_features = data.shape
-    n_clusters = mu.shape[0]
     responsibilities = np.zeros((n_samples, n_clusters))
     log_likelihoods = []
 
@@ -46,7 +43,7 @@ def em_algorithm(data, mu, sigma, pi, max_iter=100, tol=1e-6):
             sigma[i] = np.sqrt((responsibilities[:, i].reshape(-1, 1) * diff ** 2).sum(axis=0) / N_k[i])
         pi = N_k / n_samples
 
-        # Log-likelihood
+        # Log-likelihood calculation
         log_likelihood = np.sum(np.log(np.sum([pi[k] * gaussian_pdf(data, mu[k], np.diag(sigma[k] ** 2))
                                                for k in range(n_clusters)], axis=0)))
         log_likelihoods.append(log_likelihood)
