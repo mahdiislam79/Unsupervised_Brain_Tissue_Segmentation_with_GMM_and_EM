@@ -16,13 +16,15 @@ def calculate_sigma(data, labels, n_clusters=3):
     return np.array(sigma)
 
 def gaussian_pdf(data, mean, cov):
-    """Calculate Gaussian probability density function."""
+    """Calculate Gaussian probability density function with numerical stability."""
     size = len(data)
+    cov += np.eye(size) * 1e-6  # Add a small value to the diagonal
     det = np.linalg.det(cov)
     norm_const = 1.0 / (np.power((2 * np.pi), float(size) / 2) * np.power(det, 1.0 / 2))
     data_diff = data - mean
     result = np.exp(-0.5 * np.sum(np.dot(data_diff, np.linalg.inv(cov)) * data_diff, axis=1))
     return norm_const * result
+
 
 def em_algorithm(data, mu, sigma, pi, max_iter=100, tol=1e-6):
     n_samples, n_features = data.shape
