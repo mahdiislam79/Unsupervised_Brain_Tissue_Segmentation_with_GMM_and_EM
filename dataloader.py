@@ -1,16 +1,17 @@
+import os
 import nibabel as nib
 import numpy as np
 
-def load_mri_image(image_path):
-    """Load an MRI image from the given file path."""
-    img_data = nib.load(image_path)
-    return img_data.get_fdata()
+def load_mri_data(input_dir):
+    t1_file = os.path.join(input_dir, 'T1.nii')
+    flair_file = os.path.join(input_dir, 'T2_FLAIR.nii')
+    gt_file = os.path.join(input_dir, 'LabelsForTesting.nii')
 
-def get_data_within_labels(image_data, labels):
-    """Extract image data corresponding to labeled regions."""
-    return image_data[labels > 0]
+    t1_data = nib.load(t1_file).get_fdata()
+    flair_data = nib.load(flair_file).get_fdata()
+    gt_data = nib.load(gt_file).get_fdata()
 
-def prepare_data_for_clustering(t1_image_data, labels):
-    """Prepare data for clustering by extracting relevant voxels."""
-    y_data = get_data_within_labels(t1_image_data, labels)
-    return np.array([y_data]).T
+    return t1_data, flair_data, gt_data
+
+def normalize_data(data):
+    return (data - np.mean(data)) / np.std(data)
