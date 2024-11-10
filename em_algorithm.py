@@ -15,33 +15,42 @@ def calculate_sigma(data, labels, n_clusters=3):
         sigma.append(cluster_std)
     return np.array(sigma)
 
-def em_algorithm(data, mu, sigma, pi, max_iters=100, tol=1e-4):
-    """Expectation-Maximization algorithm for clustering."""
-    n, d = data.shape
-    k = len(mu)
-    responsibilities = np.zeros((n, k))
-    
-    for iteration in range(max_iters):
-        # E-step
-        for i in range(k):
-            responsibilities[:, i] = pi[i] * gaussian_pdf(data, mu[i], sigma[i])
-        responsibilities /= responsibilities.sum(axis=1, keepdims=True)
-        
-        # M-step
-        N_k = responsibilities.sum(axis=0)
-        mu = (responsibilities.T @ data) / N_k[:, None]
-        sigma = np.array([
-            np.sqrt((responsibilities[:, i] * ((data - mu[i]) ** 2)).sum(axis=0) / N_k[i])
-            for i in range(k)
-        ])
-        pi = N_k / n
-        
-        # Check for convergence
-        if np.allclose(mu, mu, atol=tol):
-            break
-    
-    return mu, sigma, pi, responsibilities
+def gaussian_pdf(data, mean, cov):
+    """Calculate Gaussian probability density function."""
+    size = len(data)
+    det = np.linalg.det(cov)
+    norm_const = 1.0 / (np.power((2 * np.pi), float(size) / 2) * np.power(det, 1.0 / 2))
+    data_diff = data - mean
+    result = np.exp(-0.5 * np.sum(np.dot(data_diff, np.linalg.inv(cov)) * data_diff, axis=1))
+    return norm_const * result
 
-def gaussian_pdf(data, mu, sigma):
-    """Calculate the Gaussian probability density function for given data."""
-    return np.exp(-0.5 * ((data - mu) / sigma) ** 2) / (sigma * np.sqrt(2 * np.pi))
+def em_algorithm(data, mu, sigma, pi, max_iter=100, tol=1e-6):
+    n_samples, n_features = data.shape
+    n_clusters = mu.shape[0]
+    responsibilities = np.zeros((n_samples, n_clusters))
+    log_likelihoods = []
+
+    for iter in range(max_iter):
+        # E-Step
+        for i in range(n_clusters):
+            responsibilities[:, i] = pi[i] * gaussian_pdf(data, mu[i], np.diag(sigma[i] ** 2))
+        responsibilities /= np.sum(responsibilities, axis=1, keepdims=True)
+
+        # M-Step
+        N_k = responsibilities.sum(axis=0)
+        for i in range(n_clusters):
+            mu[i] = (responsibilities[:, i].reshape(-1, 1) * data).sum(axis=0) / N_k[i]
+            diff = data - mu[i]
+            sigma[i] = np.sqrt((responsibilities[:, i].reshape(-1, 1) * diff ** 2).sum(axis=0) / N_k[i])
+        pi = N_k / n_samples
+
+        # Log-likelihood
+        log_likelihood = np.sum(np.log(np.sum([pi[k] * gaussian_pdf(data, mu[k], np.diag(sigma[k] ** 2))
+                                               for k in range(n_clusters)], axis=0)))
+        log_likelihoods.append(log_likelihood)
+
+        # Convergence check
+        if iter > 0 and np.abs(log_likelihoods[-1] - log_likelihoods[-2]) < tol:
+            break
+
+    return mu, sigma, pi, log_likelihoods, responsibilities
