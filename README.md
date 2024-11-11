@@ -24,7 +24,7 @@ Dice similarity scores were calculated to evaluate the segmentation accuracy for
 - **White Matter (WM)**: WM segmentation performed well, with scores ranging from 0.824 to 0.893 across Folders 1, 3, 4, and 5. Similar to GM, Folder 2 had a lower WM score (0.539).
 - **Cerebrospinal Fluid (CSF)**: CSF segmentation showed high Dice scores, with Folder 5 achieving the best score of 0.885. Folder 2 had a slightly lower CSF score (0.805).
 
-![Dice Scores by Tissue and Algorithm](Images/dice_scores_algorithm.png)
+![Dice Scores by Tissue and Algorithm](Images/result_1.PNG)
 
 ### Folder 2 Performance Analysis
 
@@ -35,7 +35,7 @@ Folder 2 exhibited significantly lower segmentation performance, with a mean Dic
 
 This suggests that the lesion in the T2_FLAIR image contributed to the lower segmentation accuracy.
 
-![Folder 2 Segmentation Comparison](Images/folder_2_comparison.png)
+![Folder 2 Segmentation Comparison](Images/result_2.PNG)
 
 ## Results Summary
 
@@ -47,7 +47,7 @@ This suggests that the lesion in the T2_FLAIR image contributed to the lower seg
 | 4      | 0.818          | 0.021         | 0.818        | 0.863        | 0.856         |
 | 5      | 0.881          | 0.012         | 0.866        | 0.893        | 0.885         |
 
-![Dice Scores by Modality](Images/dice_scores_modality.png)
+![Dice Scores by Modality](Images/Dataset.png)
 
 ## Quantitative and Qualitative Analysis
 
