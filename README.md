@@ -12,6 +12,10 @@ The segmentation pipeline includes the following steps:
    - **Cluster Sorting**: Assigns labels consistently across scans by sorting clusters by their mean intensities (1: CSF, 2: GM, 3: WM).
 3. **Evaluation**: Dice similarity scores are used to evaluate segmentation accuracy by comparing the predicted labels to ground truth masks.
 
+## Dataset
+
+![Dataset sample](Images/Dataset.png)
+
 ## Experimental Results
 
 The following are the experimental findings from the segmentation pipeline:
@@ -47,7 +51,6 @@ This suggests that the lesion in the T2_FLAIR image contributed to the lower seg
 | 4      | 0.818          | 0.021         | 0.818        | 0.863        | 0.856         |
 | 5      | 0.881          | 0.012         | 0.866        | 0.893        | 0.885         |
 
-![Dice Scores by Modality](Images/Dataset.png)
 
 ## Quantitative and Qualitative Analysis
 
