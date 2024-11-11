@@ -43,7 +43,7 @@ This suggests that the lesion in the T2_FLAIR image contributed to the lower seg
 
 ## Results Summary
 
-| Folder | Mean Dice (T1) | Std Dice (T1) | GM Dice (T1) | WM Dice (T1) | CSF Dice (T1) |
+| Folder | Mean Dice (T1+T2) | Std Dice (T1+T2) | GM Dice (T1+T2) | WM Dice (T1+T2) | CSF Dice (T1+T2) |
 |--------|-----------------|---------------|--------------|--------------|---------------|
 | 1      | 0.847          | 0.029         | 0.806        | 0.862        | 0.873         |
 | 2      | 0.529          | 0.232         | 0.241        | 0.539        | 0.808         |
